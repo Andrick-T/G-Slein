@@ -1,31 +1,92 @@
 # G-Slein v1
 
-Telemedicine consultation platform (MERN-style architecture) with a Node.js/Express API and React/Vite frontend.
+Telemedicine consultation platform built with a Node.js/Express backend and a React/Vite frontend.
 
-> Status: Core backend API modules are implemented and wired. Frontend has routing/auth shell implemented, with most role-specific product UIs scaffolded for Phase 8 completion.
+> Status: The core app is already implemented across both layers. The project includes real authentication, role-based protected routing, patient/doctor/admin dashboards, domain feature pages, and wired backend APIs for the main telemedicine workflows.
 
 ---
 
 ## Overview
 
-G-Slein v1 provides the base for:
+G-Slein v1 is a working telemedicine platform covering the main healthcare journeys for:
 
-- User authentication and role-based access (patient, doctor, admin)
-- Doctor discovery and profile management
-- Appointment workflows
-- Consultations, prescriptions, medical records, payments, and reviews
+- Patients: doctor discovery, appointment booking, clinical records, prescriptions, payments, and reviews
+- Doctors: appointment management, patient oversight, consultation workflow, and history
+- Admins: doctor management, user oversight, appointment monitoring, payment tracking, and review oversight
 
-Backend endpoints for these domains exist and are integrated into the API router. Frontend currently includes public pages, authentication flow, protected routing, and role layout shells.
+The backend exposes domain-specific API modules and the frontend has implemented page flows for each major role and feature area rather than only a shell.
+
+---
+
+## Current Implementation Status
+
+### Backend
+
+Location: [backend](backend)
+
+Implemented modules include:
+
+- Express API with health checks and centralized error handling
+- Authentication and session flow with JWT
+- Role-aware middleware for patient, doctor, and admin access
+- API routes for:
+  - users
+  - doctors
+  - appointments
+  - medical records
+  - prescriptions
+  - payments
+  - reviews
+  - consultations
+- Database seeder support for bootstrapping local data
+
+### Frontend
+
+Location: [frontend](frontend)
+
+Implemented frontend features include:
+
+- React + Vite app shell with router setup
+- Authentication context, token persistence, and session restore
+- Protected role-based routing for patient, doctor, and admin workspaces
+- Public pages for home, login, registration, unauthorized access, and not found
+- Functional dashboard screens for each role
+- Patient feature pages for:
+  - profile
+  - doctor discovery and detail views
+  - booking and confirmation flow
+  - appointments and appointment details
+  - medical records and record details
+  - prescriptions and prescription details
+  - payments and payment details
+  - reviews
+- Doctor feature pages for:
+  - appointments
+  - appointment details
+  - patient list
+  - consultation workflow
+  - history
+- Admin feature pages for:
+  - dashboard summary
+  - users
+  - doctors and doctor detail views
+  - appointments
+  - payments
+  - reviews
+
+The UI design reference remains useful for styling consistency:
+
+- [frontend/docs/UI_VISUAL_SYSTEM.txt](frontend/docs/UI_VISUAL_SYSTEM.txt)
 
 ---
 
 ## Technology Stack
 
-| Layer    | Technology                                      |
-| -------- | ----------------------------------------------- |
-| Backend  | Node.js, Express.js, MongoDB (Mongoose), JWT    |
+| Layer | Technology |
+| --- | --- |
+| Backend | Node.js, Express.js, MongoDB (Mongoose), JWT |
 | Frontend | React 18, Vite 5, React Router, Tailwind CSS v4 |
-| Language | JavaScript / JSX                                |
+| Language | JavaScript / JSX |
 
 ---
 
@@ -35,47 +96,10 @@ Backend endpoints for these domains exist and are integrated into the API router
 G-slein-v1/
 |- backend/      Node.js + Express REST API
 |- frontend/     React + Vite web application
-|- docs/         Project-level documentation
+|- docs/         Project docs and architecture references
 |- text.txt
 |- README.md
 ```
-
-### Backend (current state)
-
-Location: [backend](backend)
-
-Implemented:
-
-- Express app with global middleware, health/root endpoints, and centralized error handling
-- JWT auth (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`)
-- Role-aware route protection (patient/doctor/admin)
-- API modules mounted for:
-  - users
-  - doctors
-  - appointments
-  - consultations
-  - medical records
-  - prescriptions
-  - payments
-  - reviews
-- Seed script available (`npm run seed`)
-
-### Frontend (current state)
-
-Location: [frontend](frontend)
-
-Implemented:
-
-- React app shell with BrowserRouter
-- Auth context with token persistence and session restore
-- Protected routes by role
-- Public routes: home, login, register placeholder, unauthorized
-- Role route shells: patient, doctor, admin dashboards (placeholders for Phase 8 feature UIs)
-- API client wrapper with Bearer token support
-
-Frontend visual guidance reference:
-
-- [frontend/docs/UI_VISUAL_SYSTEM.txt](frontend/docs/UI_VISUAL_SYSTEM.txt)
 
 ### Project Docs
 
@@ -105,20 +129,22 @@ cd backend
 npm install
 ```
 
-Create env file from `.env.example` and set required values (especially database and JWT settings), then run:
+Create the environment file and set the required values, then run:
 
 ```bash
 npm run dev
 ```
 
-Backend default URL: `http://localhost:5000`
-API base path: `http://localhost:5000/api`
+Backend default URL:
 
-Useful backend scripts:
+- `http://localhost:5000`
+- API base path: `http://localhost:5000/api`
+
+Useful scripts:
 
 - `npm run dev` - start with nodemon
-- `npm start` - start production mode
-- `npm run seed` - run database seeder
+- `npm start` - production mode
+- `npm run seed` - populate local data
 
 ### 2) Frontend setup
 
@@ -127,19 +153,21 @@ cd frontend
 npm install
 ```
 
-Create env file from `.env.example` and set frontend env values, then run:
+Configure the frontend environment file, then run:
 
 ```bash
 npm run dev
 ```
 
-Frontend default URL: `http://localhost:5173`
+Frontend default URL:
 
-Useful frontend scripts:
+- `http://localhost:5173`
 
-- `npm run dev` - start dev server
-- `npm run build` - production build
-- `npm run preview` - preview production build
+Useful scripts:
+
+- `npm run dev` - start the dev server
+- `npm run build` - build for production
+- `npm run preview` - preview the build
 
 ---
 
@@ -147,13 +175,15 @@ Useful frontend scripts:
 
 Completed:
 
-- Backend service foundation and domain route wiring
-- JWT authentication and authorization middleware
-- Frontend auth + route protection flow
-- Core repository structure and docs scaffolding
+- Full backend domain coverage for telemedicine operations
+- JWT auth and role-based access control
+- Frontend authentication and session handling
+- Protected patient, doctor, and admin app areas
+- Functional doctor booking, consultation, records, payment, prescription, review, and admin management flows
+- Documentation and UI guidance baseline for ongoing refinement
 
-In progress / next (Phase 8 focus):
+Current focus:
 
-- Full frontend feature implementation for patient/doctor/admin workflows
-- UI completion for appointments, consultations, records, prescriptions, payments, and reviews
-- Final UX polish and consistency against the visual system reference
+- Final QA and edge-case validation
+- UX polish and visual consistency tuning
+- Production hardening, data validation, and refinements based on real usage
