@@ -82,11 +82,11 @@ The UI design reference remains useful for styling consistency:
 
 ## Technology Stack
 
-| Layer | Technology |
-| --- | --- |
-| Backend | Node.js, Express.js, MongoDB (Mongoose), JWT |
+| Layer    | Technology                                      |
+| -------- | ----------------------------------------------- |
+| Backend  | Node.js, Express.js, MongoDB (Mongoose), JWT    |
 | Frontend | React 18, Vite 5, React Router, Tailwind CSS v4 |
-| Language | JavaScript / JSX |
+| Language | JavaScript / JSX                                |
 
 ---
 

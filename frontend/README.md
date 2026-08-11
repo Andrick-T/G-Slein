@@ -187,8 +187,8 @@ npm run preview
 
 ## Environment Variables
 
-| Variable | Description | Default |
-| --- | --- | --- |
+| Variable          | Description          | Default                   |
+| ----------------- | -------------------- | ------------------------- |
 | VITE_API_BASE_URL | Backend API base URL | http://localhost:5000/api |
 
 Only variables prefixed with `VITE_` are exposed to browser code.
