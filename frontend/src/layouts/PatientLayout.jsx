@@ -1,9 +1,14 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   CalendarDays,
+  FolderOpen,
   LayoutDashboard,
   LogOut,
+  MessageSquare,
   Menu,
+  Pill,
+  ReceiptText,
+  Stethoscope,
   UserRound,
   X,
 } from "lucide-react";
@@ -18,7 +23,7 @@ function PatientLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate("/login", { replace: true, state: null });
   };
 
   const closeMobileNav = () => {
@@ -38,9 +43,34 @@ function PatientLayout() {
       icon: UserRound,
     },
     {
+      to: "/patient/doctors",
+      label: "Doctors",
+      icon: Stethoscope,
+    },
+    {
       to: "/patient/appointments",
       label: "Appointments",
       icon: CalendarDays,
+    },
+    {
+      to: "/patient/medical-records",
+      label: "Medical Records",
+      icon: FolderOpen,
+    },
+    {
+      to: "/patient/prescriptions",
+      label: "Prescriptions",
+      icon: Pill,
+    },
+    {
+      to: "/patient/payments",
+      label: "Payments",
+      icon: ReceiptText,
+    },
+    {
+      to: "/patient/reviews",
+      label: "Reviews",
+      icon: MessageSquare,
     },
   ];
 

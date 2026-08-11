@@ -91,6 +91,20 @@ function Login() {
     }
   };
 
+  const getAllowedPostLoginPath = (userRole, intendedPath) => {
+    if (!intendedPath) {
+      return getDashboardPath(userRole);
+    }
+
+    const dashboardPath = getDashboardPath(userRole);
+
+    if (dashboardPath !== "/" && intendedPath.startsWith(dashboardPath)) {
+      return intendedPath;
+    }
+
+    return dashboardPath;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -103,7 +117,7 @@ function Login() {
 
       const intendedPath = location.state?.from?.pathname;
 
-      navigate(intendedPath || getDashboardPath(user.role), {
+      navigate(getAllowedPostLoginPath(user.role, intendedPath), {
         replace: true,
       });
     } catch (err) {
