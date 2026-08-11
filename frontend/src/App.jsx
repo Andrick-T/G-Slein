@@ -1,9 +1,11 @@
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes.jsx";
+
 function App() {
   return (
-    <div>
-      <h1>G-Slein v1</h1>
-      <p>Telemedicine consultation platform — frontend is running.</p>
-    </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

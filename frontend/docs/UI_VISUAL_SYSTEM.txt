@@ -1,0 +1,469 @@
+G-SLEIN V1 - UI VISUAL SYSTEM
+
+Project
+G-Slein v1 - MERN Telemedicine Consultation Platform
+
+Purpose
+Define the visual conventions frontend development must follow consistently.
+This reference is for Phase 8 and later frontend work.
+
+Stack Context
+- React + Vite
+- Tailwind CSS
+- React Router
+- JavaScript/JSX
+- Lucide React icons
+- Inter font
+- Bootstrap is not used
+
+==================================================
+1) BRAND / VISUAL DIRECTION
+==================================================
+Communicate:
+- Trust
+- Safety
+- Professionalism
+- Accessibility
+- Human care
+- Technology
+- Calmness
+- Simplicity
+
+Visual character:
+- Modern healthcare + modern SaaS
+- Clean, professional, human
+- Calm, responsive, accessible
+- Minimal rather than decorative
+
+Avoid:
+- Excessive gradients
+- Excessive glassmorphism
+- Heavy animations
+- Overly decorative dashboards
+- Excessive colors
+- Crowded interfaces
+- Tiny text
+- Generic "AI startup" aesthetics
+
+==================================================
+2) COLOR SYSTEM
+==================================================
+Primary (G-Slein Blue)
+- Primary: #2563EB
+- Primary Dark: #1D4ED8
+- Primary Light: #DBEAFE
+Use for:
+- Primary buttons
+- Important CTAs
+- Links
+- Active navigation
+- Primary actions
+- Important interface highlights
+
+Secondary (Medical Teal)
+- Secondary: #0D9488
+- Secondary Dark: #0F766E
+- Secondary Light: #CCFBF1
+Use for:
+- Healthcare accents
+- Secondary actions
+- Supporting highlights
+- Selected healthcare-related states
+
+Neutrals
+- Background: #F8FAFC
+- Surface: #FFFFFF
+- Primary Text: #0F172A
+- Muted Text: #64748B
+- Border: #E2E8F0
+
+Semantic
+- Success: #16A34A
+- Warning: #F59E0B
+- Error: #DC2626
+- Info: #0284C7
+
+Rule:
+- Do not use colors randomly.
+- Most surfaces remain neutral.
+- Blue and teal are accents, not all-purpose fills.
+
+==================================================
+3) TYPOGRAPHY
+==================================================
+Font
+- Inter everywhere: headings, body, buttons, forms, tables, dashboards, navigation
+
+Hierarchy (approx.)
+- H1: 36-48px (desktop)
+- H2: 28-36px
+- H3: 20-24px
+- Body: 15-16px
+- Small: 13-14px
+
+Rule:
+- Use Tailwind responsive scaling.
+- Do not add more fonts without a concrete requirement.
+
+==================================================
+4) BORDER RADIUS
+==================================================
+- Buttons: 8px
+- Inputs: 8px
+- Cards: 12px
+- Modals: 12-16px
+- Large sections: 16-24px
+
+Use rounded/full pills mainly for:
+- Status badges
+- Tags
+- Small labels
+- Compact indicators
+
+Avoid excessive rounded-full styling.
+
+==================================================
+5) SHADOWS
+==================================================
+Use subtle elevation only where useful.
+Prefer:
+- Borders
+- White surfaces
+- Small/subtle shadows
+
+Avoid heavy floating-card effects.
+Typical cases:
+- Dropdowns
+- Modals
+- Navigation elements
+- Elevated cards
+- Floating UI
+
+==================================================
+6) ICONS
+==================================================
+Use Lucide React.
+Do not mix icon libraries without concrete reason.
+
+Common icons:
+- Home, Calendar, Users, User, Search
+- Stethoscope, FileText, Pill, CreditCard
+- Bell, Settings, LogOut
+- Video, Clock, Star, MessageCircle
+- ChevronRight, Menu, X
+
+Rules:
+- Icons support text, not replace important text.
+- Icon-only buttons require accessible labels.
+
+==================================================
+7) LOGO / BRAND ASSETS
+==================================================
+Target assets (eventual):
+- logo.svg
+- logo-mark.svg
+- favicon.svg
+
+Logo qualities:
+- Simple, recognizable, professional
+- Healthcare-appropriate
+- Works on desktop + mobile
+- Works at small sizes
+
+Avoid overly complex medical symbols.
+
+==================================================
+8) LANDING PAGE VISUAL DIRECTION
+==================================================
+Primary message:
+- Telemedicine should be obvious immediately.
+
+Preferred hero concept:
+- Doctor and patient in a realistic video consultation.
+
+Imagery tone:
+- Authentic
+- Professional
+- Human
+- Healthcare-focused
+- Diverse
+- Where appropriate, include African healthcare professionals/patients for context fit.
+
+Avoid random stock-photo overload.
+
+Recommended initial visuals:
+- 1 hero visual
+- 1 how-it-works visual/illustration
+- 3 feature illustrations/icons
+- 1 healthcare/doctor CTA image
+- Optional testimonial/accessibility imagery
+
+Use Lucide or lightweight illustrations for simple info blocks instead of unnecessary photos.
+
+==================================================
+9) DASHBOARD VISUAL DIRECTION
+==================================================
+Patient dashboard (friendly, approachable) prioritize:
+- Upcoming consultation
+- Find a doctor
+- Appointments
+- Prescriptions
+- Medical records
+- Payments
+- Reviews
+
+Doctor dashboard (clinical workspace) prioritize:
+- Today's appointments
+- Patient queue
+- Current consultation
+- Patient information
+- Prescriptions
+- Medical history
+
+Admin dashboard (utilitarian management) prioritize:
+- Users
+- Doctors
+- Patients
+- Appointments
+- Payments
+- Reviews
+- Platform status
+
+Rule:
+- No large hero photos inside authenticated dashboards.
+
+==================================================
+10) STATUS BADGES
+==================================================
+Use semantic + consistent mappings:
+- Pending: Warning/amber
+- Confirmed: Primary/blue
+- Completed: Success/green
+- Cancelled: Error/red
+- In Progress: Secondary/teal
+
+Rule:
+- Never communicate status by color alone.
+- Always include text and/or icons.
+
+==================================================
+11) MEDICAL RECORDS
+==================================================
+Style like secure healthcare documents.
+Show practical fields such as:
+- Record type
+- Document name
+- Date
+- Doctor
+- Related appointment
+- View/download action
+
+Security rule:
+- Never expose sensitive files via public URLs.
+- Frontend must use protected backend endpoints.
+
+==================================================
+12) PRESCRIPTIONS
+==================================================
+Presentation goal:
+- Professional medical-document feel
+- Clean and document-oriented layout
+
+Typical fields:
+- Patient
+- Doctor
+- Date
+- Medication
+- Dosage
+- Frequency
+- Duration
+- Instructions
+
+==================================================
+13) MOBILE UX
+==================================================
+Must support:
+- Mobile
+- Tablet
+- Desktop
+
+Patterns:
+- Desktop can use sidebar
+- Mobile should use drawer, compact nav, or bottom nav when justified
+
+Rules:
+- Do not just shrink desktop layouts.
+- Prioritize touch-friendly controls.
+
+==================================================
+14) RESPONSIVE DESIGN
+==================================================
+Use Tailwind breakpoints:
+- sm:
+- md:
+- lg:
+- xl:
+
+Responsive focus areas:
+- Navigation
+- Sidebars
+- Forms
+- Tables
+- Appointment interfaces
+- Doctor cards
+- Medical records
+- Prescriptions
+- Admin interfaces
+
+==================================================
+15) EMPTY STATES
+==================================================
+Avoid blank screens.
+Example scenario:
+- No upcoming appointments
+
+Provide:
+- Clear icon/illustration
+- Short explanation
+- Relevant action (example: "Find a Doctor")
+
+Rule:
+- Do not create unique downloaded art for every empty state.
+
+==================================================
+16) LOADING STATES
+==================================================
+Use:
+- Spinners where appropriate
+- Skeletons for data-heavy pages
+
+Good candidates:
+- Doctor cards
+- Appointments
+- Dashboard cards
+- Tables
+- Medical records
+
+Keep loading states simple.
+
+==================================================
+17) ERROR STATES
+==================================================
+Pattern:
+- Clear error icon
+- Short explanation
+- Retry/action where appropriate
+
+Example copy:
+- "Something went wrong"
+- "We couldn't load your appointments."
+- "Try Again"
+
+==================================================
+18) IMAGES / ASSETS
+==================================================
+Prefer:
+- SVG
+- WebP
+- Optimized images
+
+Avoid unnecessarily large files.
+Do not make the landing page depend on random external image URLs.
+Critical brand assets should eventually be stored locally.
+
+Suggested organization when assets exist:
+- src/assets/
+- src/assets/brand/
+- src/assets/images/
+- src/assets/illustrations/
+
+Rule:
+- Do not create asset folders only for structure.
+
+==================================================
+19) ACCESSIBILITY
+==================================================
+Rules:
+- Meaningful images need proper alt text.
+- Icon-only buttons need accessible labels.
+- Interactive elements need visible/focusable states.
+- Do not use color alone to convey important information.
+- Maintain readable contrast.
+- Forms need clear labels.
+
+==================================================
+20) ANIMATION
+==================================================
+Keep animation minimal.
+Acceptable:
+- Hover transitions
+- Focus transitions
+- Modal transitions
+- Dropdown transitions
+- Skeleton animations
+- Small page transitions where useful
+
+Avoid:
+- Parallax
+- Excessive scroll animations
+- Constant floating elements
+- Large entrance animations
+- Complex animation libraries without need
+
+==================================================
+21) COMPONENT GUIDELINE
+==================================================
+Create shared components only when genuinely reusable.
+Potential shared components:
+- Button
+- Input
+- Select
+- Modal
+- Badge
+- Card
+- Table
+- Pagination
+- Spinner
+- Alert
+- EmptyState
+- ConfirmDialog
+- Avatar
+- StatusBadge
+
+Rule:
+- Do not create tiny components just to increase count.
+
+==================================================
+22) IMPLEMENTATION PRINCIPLE
+==================================================
+Visual system goal:
+- Consistency, not a large design system
+
+When implementing new UI:
+1. Prefer existing components.
+2. Reuse existing Tailwind conventions.
+3. Reuse existing colors.
+4. Reuse Lucide icons.
+5. Avoid new visual patterns without justification.
+6. Keep interfaces simple.
+7. Prioritize usability over decoration.
+8. Preserve existing working frontend code.
+9. Do not introduce unnecessary dependencies.
+10. Do not over-engineer.
+
+==================================================
+23) DEVELOPMENT CONSTRAINT
+==================================================
+Current project reality:
+- One developer
+- Heavy AI assistance
+- About two weeks
+
+Decision rules:
+- Simplicity > abstraction
+- Functionality > decoration
+- Consistency > complexity
+- Validation > premature optimization
+
+This document is a practical implementation reference for Phase 8 and later frontend work.
+Do not modify application code merely because this document exists.
