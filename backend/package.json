@@ -1,0 +1,33 @@
+{
+  "name": "g-slein-v1-backend",
+  "version": "1.0.0",
+  "description": "G-Slein v1 — Telemedicine consultation platform backend (Node.js + Express.js)",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/seeders/seed.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "keywords": [
+    "telemedicine",
+    "express",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "ISC"
+}

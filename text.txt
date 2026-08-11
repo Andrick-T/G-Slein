@@ -1,0 +1,953 @@
+# G-SLEIN V1 — PHASE 7 EXECUTION PROMPT
+
+## Frontend Foundation Validation
+
+We are continuing development of **G-Slein v1**, a MERN-stack telemedicine consultation platform.
+
+You are my **senior frontend engineer, React architect, UI engineer, integration engineer, and testing partner**.
+
+We are a **solo developer + heavy AI assistance** with a strict **2-week development window**.
+
+Your primary objective is:
+
+> **Build the simplest frontend foundation that is sufficient for G-Slein v1. Do not over-engineer, over-abstract, or refactor working code without a concrete reason.**
+
+---
+
+# 1. PROJECT
+
+## G-Slein v1 — Telemedicine Consultation Platform
+
+Purpose:
+
+A web platform connecting **patients and doctors** for:
+
+* registration/authentication
+* doctor discovery
+* appointment booking
+* virtual consultations
+* medical records
+* prescriptions
+* payments
+* notifications
+* doctor reviews
+* administration
+
+The application is a **monolithic MERN application**.
+
+There are NO microservices.
+
+---
+
+# 2. TECHNOLOGY STACK
+
+## Backend
+
+* Node.js
+* Express.js
+* MongoDB Atlas
+* Mongoose
+* JWT
+* bcrypt/bcryptjs
+* REST API
+
+## Frontend
+
+* React
+* Vite
+* Tailwind CSS
+* React Router
+* JavaScript/JSX unless the existing project already uses TypeScript
+* Context/hooks where appropriate
+
+## Styling
+
+**Tailwind CSS is the official styling system.**
+
+IMPORTANT:
+
+The original project specification mentioned Bootstrap, but that decision has been changed.
+
+### Do NOT use Bootstrap.
+
+Do not introduce another CSS framework.
+
+Do not create a complicated custom design system.
+
+---
+
+# 3. AUTHORITATIVE DEVELOPMENT ROADMAP
+
+The project follows this exact workflow:
+
+```text
+PHASE 0 — Project & Environment Validation
+        ↓
+PHASE 1 — Architecture & Structure Validation
+        ↓
+PHASE 2 — Database Validation
+        ↓
+PHASE 3 — Backend Foundation Validation
+        ↓
+PHASE 4 — Authentication & Authorization Validation
+        ↓
+PHASE 5 — Core Backend Modules Validation
+        ↓
+PHASE 6 — API Validation
+        ↓
+PHASE 7 — Frontend Foundation Validation       ← CURRENT
+        ↓
+PHASE 8 — Frontend Module Validation
+        ↓
+PHASE 9 — Backend ↔ Frontend Integration
+        ↓
+PHASE 10 — External Services Validation
+        ↓
+PHASE 11 — Security Validation
+        ↓
+PHASE 12 — End-to-End Business Workflow Validation
+        ↓
+PHASE 13 — Error / Edge Case Validation
+        ↓
+PHASE 14 — Production Validation
+        ↓
+FINAL ACCEPTANCE
+```
+
+Phases **0–6 are complete and validated**.
+
+Do NOT redo them unless Phase 7 discovers an actual frontend/backend compatibility problem.
+
+---
+
+# 4. CRITICAL DEVELOPMENT RULE
+
+## THE EXISTING REPOSITORY IS THE SOURCE OF TRUTH.
+
+Before writing or modifying frontend code:
+
+1. Inspect the existing frontend structure.
+2. Inspect `package.json`.
+3. Inspect `App.jsx`.
+4. Inspect `main.jsx`.
+5. Inspect existing pages.
+6. Inspect existing components.
+7. Inspect existing layouts.
+8. Inspect existing utilities/services.
+9. Inspect Tailwind configuration.
+10. Inspect existing routing.
+11. Inspect existing environment configuration.
+
+Then compare the actual project against the architecture below.
+
+### DO NOT:
+
+* rebuild an already working frontend
+* rename files unnecessarily
+* move files unnecessarily
+* delete working components
+* replace working libraries without reason
+* introduce new state-management libraries unnecessarily
+* create folders merely because they appear in this prompt
+* create duplicate utilities
+* create abstractions for one-time operations
+* refactor code simply because you would personally structure it differently
+
+If the existing frontend already follows the agreed architecture reasonably well:
+
+> **Keep it. Validate it. Improve only what is actually missing or incorrect.**
+
+---
+
+# 5. AGREED FRONTEND ARCHITECTURE
+
+The target architecture is intentionally simple:
+
+```text
+frontend/
+│
+├── src/
+│   ├── assets/
+│   │
+│   ├── components/
+│   │   ├── global/
+│   │   └── module-specific components
+│   │
+│   ├── layouts/
+│   │   ├── PublicLayout.jsx
+│   │   ├── PatientLayout.jsx
+│   │   ├── DoctorLayout.jsx
+│   │   └── AdminLayout.jsx
+│   │
+│   ├── pages/
+│   │   ├── public/
+│   │   ├── auth/
+│   │   ├── patient/
+│   │   ├── doctor/
+│   │   └── admin/
+│   │
+│   ├── services/
+│   │   └── api.js
+│   │
+│   ├── context/
+│   │   └── AuthContext.jsx
+│   │
+│   ├── hooks/
+│   │
+│   ├── utils/
+│   │
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+│
+├── .env
+├── .env.example
+├── package.json
+└── ...
+```
+
+### IMPORTANT
+
+This is a **target architecture, not a command to create every folder**.
+
+If a folder is unnecessary based on the current implementation, do not create it.
+
+If the existing project uses a slightly different but equally simple organization, preserve it unless it conflicts with the agreed architecture.
+
+---
+
+# 6. COMPONENT ORGANIZATION
+
+We previously agreed that components should be organized primarily by module, with one global/shared area.
+
+Use:
+
+```text
+components/
+├── global/
+├── auth/
+├── patient/
+├── doctor/
+└── admin/
+```
+
+Only create module folders when they actually contain multiple components.
+
+A component belongs in `global/` only if it is genuinely shared.
+
+Examples:
+
+```text
+Button
+Input
+Modal
+Spinner
+Alert
+ConfirmDialog
+Pagination
+```
+
+A component such as:
+
+```text
+PatientAppointmentCard
+DoctorPatientQueue
+PrescriptionCard
+```
+
+should remain module-specific.
+
+### Do NOT:
+
+Create dozens of tiny components merely to satisfy componentization rules.
+
+A component should exist because it:
+
+* is reused
+* represents a meaningful UI responsibility
+* makes a complex page easier to maintain
+
+---
+
+# 7. PHASE 7 OBJECTIVE
+
+Phase 7 establishes the **frontend foundation**.
+
+We are NOT building the complete application UI yet.
+
+Phase 8 handles the actual frontend modules.
+
+Phase 7 should establish:
+
+```text
+React application
+      ↓
+Routing
+      ↓
+Layouts
+      ↓
+Authentication state
+      ↓
+Protected routes
+      ↓
+API client
+      ↓
+Tailwind styling foundation
+      ↓
+Responsive foundation
+```
+
+---
+
+# 8. ROUTING
+
+Use the existing routing solution if already installed.
+
+Otherwise use the simplest appropriate React Router setup.
+
+Establish the foundation for:
+
+```text
+/
+ /login
+ /register
+
+/patient/...
+/doctor/...
+/admin/...
+```
+
+Also provide:
+
+```text
+/404
+```
+
+or an equivalent fallback route.
+
+Do NOT create dozens of placeholder routes.
+
+Only establish the route structure needed by the current application.
+
+---
+
+# 9. LAYOUTS
+
+The application has three authenticated roles:
+
+```text
+patient
+doctor
+admin
+```
+
+Establish appropriate layouts:
+
+```text
+PublicLayout
+PatientLayout
+DoctorLayout
+AdminLayout
+```
+
+Layouts should provide the basic structure:
+
+```text
+Navbar/Header
+Sidebar where appropriate
+Main content area
+```
+
+Do not build complete dashboards in Phase 7.
+
+Simple placeholders are sufficient.
+
+Example:
+
+```text
+Patient Dashboard
+Doctor Dashboard
+Admin Dashboard
+```
+
+Phase 8 will implement actual dashboard functionality.
+
+---
+
+# 10. TAILWIND FOUNDATION
+
+Verify that Tailwind works correctly.
+
+Check:
+
+* installation
+* configuration
+* CSS import
+* JSX class processing
+* responsive classes
+* development build
+* production build compatibility
+
+Remove Bootstrap usage if it exists.
+
+Do not create a giant Tailwind theme or design system.
+
+Use Tailwind directly for now.
+
+Only create reusable styling abstractions when repeated patterns genuinely justify them.
+
+---
+
+# 11. API CLIENT
+
+Create or validate a centralized API client.
+
+Preferred location:
+
+```text
+src/services/api.js
+```
+
+The frontend should NOT scatter raw requests throughout components.
+
+Avoid:
+
+```javascript
+fetch("http://localhost:5000/api/...")
+```
+
+everywhere.
+
+Use:
+
+```text
+React component
+      ↓
+API service
+      ↓
+Express API
+```
+
+The backend base URL must come from environment configuration.
+
+Example:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Use the **actual Phase 6 API contract**.
+
+Do not invent endpoints.
+
+---
+
+# 12. AUTHENTICATION STATE
+
+Establish simple global authentication state.
+
+The frontend needs to know:
+
+```text
+isAuthenticated
+currentUser
+role
+loading
+login()
+logout()
+```
+
+A lightweight:
+
+```text
+AuthContext
+```
+
+plus hooks is sufficient.
+
+### DO NOT introduce:
+
+* Redux
+* Redux Toolkit
+* Zustand
+* MobX
+* Recoil
+* custom state-management frameworks
+
+unless the repository already uses one or a concrete project requirement makes it necessary.
+
+For G-Slein v1:
+
+> **React Context + hooks is sufficient.**
+
+---
+
+# 13. LOGIN / LOGOUT FLOW
+
+Connect the frontend to the already validated authentication API.
+
+Expected flow:
+
+```text
+Login
+  ↓
+Backend authentication
+  ↓
+Token received
+  ↓
+Authentication state stored
+  ↓
+Current user retrieved
+  ↓
+Role identified
+  ↓
+User redirected appropriately
+```
+
+Logout:
+
+```text
+clear authentication state
+clear stored token
+redirect to appropriate public page
+```
+
+Use the actual backend implementation.
+
+Do NOT modify the backend authentication architecture during Phase 7 unless an actual compatibility bug is discovered.
+
+---
+
+# 14. TOKEN HANDLING
+
+Inspect the existing backend authentication implementation and use the simplest compatible frontend approach.
+
+If using browser storage for the current MVP, understand that this is not the final security-hardening phase.
+
+Do not introduce elaborate token-refresh architecture unless the existing backend requires it.
+
+Full security hardening belongs to:
+
+```text
+PHASE 11 — SECURITY VALIDATION
+```
+
+---
+
+# 15. PROTECTED ROUTES
+
+Create a simple protected-route mechanism.
+
+Conceptually:
+
+```text
+ProtectedRoute
+      ↓
+Authenticated?
+ ├── No → Login
+ └── Yes
+      ↓
+    Role?
+      ├── patient → Patient area
+      ├── doctor  → Doctor area
+      └── admin   → Admin area
+```
+
+Role-specific route protection is required.
+
+However:
+
+> Frontend route protection is NOT the security authority.
+
+The backend remains responsible for actual authorization.
+
+Never assume hiding a page makes the API secure.
+
+---
+
+# 16. GLOBAL UI STATES
+
+Establish only the basic shared UI mechanisms required by the application:
+
+```text
+Loading
+Error
+Empty state
+Success feedback
+```
+
+Examples:
+
+```text
+LoadingSpinner
+ErrorMessage
+EmptyState
+```
+
+Do not build a complex global notification/event system.
+
+---
+
+# 17. RESPONSIVE FOUNDATION
+
+The application must work on:
+
+```text
+Mobile
+Tablet
+Desktop
+```
+
+Use Tailwind responsive utilities:
+
+```text
+sm:
+md:
+lg:
+xl:
+```
+
+Do not postpone mobile responsiveness until the end.
+
+However, do not spend Phase 7 designing polished production UI.
+
+The goal is a solid responsive foundation.
+
+---
+
+# 18. ENVIRONMENT CONFIGURATION
+
+Verify:
+
+```text
+.env
+.env.example
+```
+
+Example:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Never place secrets in frontend environment variables.
+
+Anything exposed through:
+
+```text
+VITE_*
+```
+
+is effectively public.
+
+Therefore NEVER put:
+
+```text
+MongoDB credentials
+JWT secret
+private API keys
+server credentials
+```
+
+in the frontend.
+
+---
+
+# 19. FRONTEND ↔ BACKEND COMPATIBILITY
+
+Phase 6 has already validated the API.
+
+Phase 7 should verify that the frontend can communicate with it.
+
+At minimum:
+
+```text
+Frontend
+   ↓
+GET /api/health
+   ↓
+Backend response
+```
+
+and:
+
+```text
+Frontend
+   ↓
+Login
+   ↓
+Backend
+   ↓
+Authenticated user
+```
+
+If an API contract mismatch is discovered:
+
+1. identify it
+2. determine whether frontend or backend is wrong
+3. prefer the smallest correction
+4. do not redesign the API unnecessarily
+
+---
+
+# 20. TESTING
+
+Validate:
+
+### Application
+
+```text
+☐ npm run dev works
+☐ no startup errors
+☐ no console-breaking errors
+☐ Tailwind renders
+```
+
+### Routing
+
+```text
+☐ public routes
+☐ login
+☐ register
+☐ patient route
+☐ doctor route
+☐ admin route
+☐ unauthorized redirect
+☐ 404
+```
+
+### Authentication
+
+```text
+☐ login works
+☐ authentication state persists appropriately
+☐ current user loads
+☐ logout works
+☐ protected routes work
+☐ role-based routes work
+```
+
+### API
+
+```text
+☐ frontend reaches backend
+☐ API base URL comes from .env
+☐ authenticated API requests work
+☐ API errors are handled
+```
+
+### Responsive
+
+```text
+☐ mobile
+☐ tablet
+☐ desktop
+```
+
+---
+
+# 21. DO NOT IMPLEMENT YET
+
+Do NOT build complete:
+
+```text
+❌ Patient dashboard modules
+❌ Doctor dashboard modules
+❌ Admin management modules
+❌ Appointment UI
+❌ Medical record UI
+❌ Prescription UI
+❌ Payment UI
+❌ Review UI
+❌ Jitsi/video integration
+❌ Email integration
+❌ SMS integration
+❌ Real payment gateway
+```
+
+Those belong to later phases.
+
+Phase 7 is the foundation.
+
+---
+
+# 22. DO NOT OVER-ENGINEER
+
+This is especially important.
+
+Do NOT create:
+
+```text
+❌ frontend service layer + repository layer + adapter layer
+❌ dozens of hooks
+❌ dozens of context providers
+❌ global state architecture
+❌ custom component framework
+❌ design-system library
+❌ unnecessary utility functions
+❌ unnecessary folder nesting
+❌ duplicate API clients
+❌ duplicate authentication systems
+❌ unnecessary TypeScript migration
+❌ unnecessary dependency installation
+```
+
+We have two weeks.
+
+Prefer:
+
+```text
+simple
+clear
+direct
+maintainable
+```
+
+over:
+
+```text
+abstract
+generic
+enterprise-style
+```
+
+---
+
+# 23. CHANGE CONTROL RULE
+
+Before making significant changes:
+
+### First report:
+
+```text
+1. What already exists
+2. What is missing
+3. What actually needs modification
+4. What files will be created
+5. What files will be modified
+6. Why each change is necessary
+```
+
+Then implement.
+
+If the existing implementation already satisfies the requirement:
+
+> **Do nothing.**
+
+Do not refactor merely to make it look like your preferred architecture.
+
+---
+
+# 24. PHASE 7 ACCEPTANCE CRITERIA
+
+Phase 7 is complete only when:
+
+```text
+☐ React frontend starts successfully
+☐ Existing frontend structure has been inspected
+☐ Existing working code has been preserved
+☐ Tailwind CSS works correctly
+☐ Bootstrap is not used
+☐ Routing works
+☐ Public route foundation works
+☐ Patient route foundation works
+☐ Doctor route foundation works
+☐ Admin route foundation works
+☐ Public layout works
+☐ Patient layout works
+☐ Doctor layout works
+☐ Admin layout works
+☐ API client works
+☐ API URL uses environment configuration
+☐ AuthContext/auth state works
+☐ Login works with the existing backend
+☐ Logout works
+☐ Current-user retrieval works
+☐ Protected routes work
+☐ Role-based routes work
+☐ Basic loading/error states work
+☐ Responsive foundation works
+☐ 404 handling works
+☐ No secrets exposed in frontend
+☐ No unnecessary dependencies introduced
+☐ No unnecessary folders/files created
+☐ No unnecessary refactoring performed
+```
+
+---
+
+# 25. FINAL REPORT
+
+When Phase 7 is complete, provide:
+
+```text
+PHASE 7 — FRONTEND FOUNDATION VALIDATION
+
+Status: COMPLETE
+
+Existing structure:
+...
+
+Files created:
+...
+
+Files modified:
+...
+
+Dependencies added:
+...
+
+Routes established:
+...
+
+Authentication status:
+...
+
+Tailwind status:
+...
+
+API connectivity:
+...
+
+Tests:
+...
+
+Known limitations:
+...
+
+Next:
+PHASE 8 — FRONTEND MODULE VALIDATION
+```
+
+---
+
+# STARTING INSTRUCTION
+
+**Do NOT immediately write code.**
+
+First inspect the actual frontend repository and report:
+
+1. Current folder structure
+2. `package.json`
+3. Tailwind setup
+4. `App.jsx`
+5. `main.jsx`
+6. Existing routing
+7. Existing layouts
+8. Existing pages
+9. Existing components
+10. Existing API utilities/services
+11. Existing authentication implementation
+12. `.env` / `.env.example` structure
+13. What already satisfies Phase 7
+14. What is genuinely missing
+
+Then propose the **smallest set of changes required to complete Phase 7**.
+
+Do not create or modify anything unnecessarily.
+
+The repository is the source of truth.
+
+> **Inspect first. Preserve working code. Build only what is missing. Keep G-Slein v1 simple.**
+
+
