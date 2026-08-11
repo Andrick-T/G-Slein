@@ -12,6 +12,7 @@ import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
 
 import PatientDashboard from "../pages/patient/PatientDashboard.jsx";
+import PatientProfile from "../pages/patient/PatientProfile.jsx";
 import DoctorDashboard from "../pages/doctor/DoctorDashboard.jsx";
 import AdminDashboard from "../pages/admin/AdminDashboard.jsx";
 
@@ -33,6 +34,7 @@ function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
         <Route path="/patient" element={<PatientLayout />}>
           <Route index element={<PatientDashboard />} />
+          <Route path="profile" element={<PatientProfile />} />
         </Route>
       </Route>
 
