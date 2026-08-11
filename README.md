@@ -1,59 +1,92 @@
 # G-Slein v1
 
-**Telemedicine consultation platform**
+Telemedicine consultation platform (MERN-style architecture) with a Node.js/Express API and React/Vite frontend.
 
-> **Status:** Initial project foundation — no features implemented yet.
+> Status: Core backend API modules are implemented and wired. Frontend has routing/auth shell implemented, with most role-specific product UIs scaffolded for Phase 8 completion.
 
 ---
 
 ## Overview
 
-G-Slein v1 is a full-stack telemedicine consultation platform that will enable patients to discover doctors, book appointments, conduct video consultations, and manage medical records — all through a secure web application.
+G-Slein v1 provides the base for:
+
+- User authentication and role-based access (patient, doctor, admin)
+- Doctor discovery and profile management
+- Appointment workflows
+- Consultations, prescriptions, medical records, payments, and reviews
+
+Backend endpoints for these domains exist and are integrated into the API router. Frontend currently includes public pages, authentication flow, protected routing, and role layout shells.
 
 ---
 
 ## Technology Stack
 
-| Layer    | Technology          |
-| -------- | ------------------- |
-| Backend  | Node.js, Express.js |
-| Frontend | React 18, Vite      |
-| Language | JavaScript / JSX    |
+| Layer    | Technology                                      |
+| -------- | ----------------------------------------------- |
+| Backend  | Node.js, Express.js, MongoDB (Mongoose), JWT    |
+| Frontend | React 18, Vite 5, React Router, Tailwind CSS v4 |
+| Language | JavaScript / JSX                                |
 
 ---
 
 ## Repository Structure
 
+```text
+G-slein-v1/
+|- backend/      Node.js + Express REST API
+|- frontend/     React + Vite web application
+|- docs/         Project-level documentation
+|- text.txt
+|- README.md
 ```
-G-Slein-v1/
-├── backend/     Node.js + Express.js REST API
-├── frontend/    React + Vite web application
-├── docs/        Project documentation
-└── README.md    This file
-```
 
-### `backend/`
+### Backend (current state)
 
-The REST API server built with Node.js and Express.js using ES Modules. Responsible for handling all business logic, data persistence, authentication, and third-party integrations.
+Location: [backend](backend)
 
-See [backend/README.md](backend/README.md) for backend-specific setup and documentation.
+Implemented:
 
-### `frontend/`
+- Express app with global middleware, health/root endpoints, and centralized error handling
+- JWT auth (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`)
+- Role-aware route protection (patient/doctor/admin)
+- API modules mounted for:
+  - users
+  - doctors
+  - appointments
+  - consultations
+  - medical records
+  - prescriptions
+  - payments
+  - reviews
+- Seed script available (`npm run seed`)
 
-The web client built with React and Vite. Responsible for all user-facing interfaces and communicates with the backend API over HTTP.
+### Frontend (current state)
 
-See [frontend/README.md](frontend/README.md) for frontend-specific setup and documentation.
+Location: [frontend](frontend)
 
-### `docs/`
+Implemented:
 
-Project-level documentation organized into four areas:
+- React app shell with BrowserRouter
+- Auth context with token persistence and session restore
+- Protected routes by role
+- Public routes: home, login, register placeholder, unauthorized
+- Role route shells: patient, doctor, admin dashboards (placeholders for Phase 8 feature UIs)
+- API client wrapper with Bearer token support
 
-| Directory            | Purpose                                               |
-| -------------------- | ----------------------------------------------------- |
-| `docs/architecture/` | System architecture, technical design, and ADRs       |
-| `docs/api/`          | API specifications and endpoint documentation         |
-| `docs/database/`     | Database schema, ER diagrams, and migration decisions |
-| `docs/setup/`        | Developer environment setup and deployment guides     |
+Frontend visual guidance reference:
+
+- [frontend/docs/UI_VISUAL_SYSTEM.txt](frontend/docs/UI_VISUAL_SYSTEM.txt)
+
+### Project Docs
+
+Location: [docs](docs)
+
+Areas:
+
+- [docs/architecture](docs/architecture)
+- [docs/api](docs/api)
+- [docs/database](docs/database)
+- [docs/setup](docs/setup)
 
 ---
 
@@ -61,41 +94,66 @@ Project-level documentation organized into four areas:
 
 ### Prerequisites
 
-- Node.js ≥ 18
-- npm ≥ 9
+- Node.js >= 18
+- npm >= 9
+- MongoDB instance (local or remote)
 
-### Backend
+### 1) Backend setup
 
 ```bash
 cd backend
-cp .env.example .env
 npm install
+```
+
+Create env file from `.env.example` and set required values (especially database and JWT settings), then run:
+
+```bash
 npm run dev
 ```
 
-API available at: `http://localhost:5000`
+Backend default URL: `http://localhost:5000`
+API base path: `http://localhost:5000/api`
 
-### Frontend
+Useful backend scripts:
+
+- `npm run dev` - start with nodemon
+- `npm start` - start production mode
+- `npm run seed` - run database seeder
+
+### 2) Frontend setup
 
 ```bash
 cd frontend
-cp .env.example .env
 npm install
+```
+
+Create env file from `.env.example` and set frontend env values, then run:
+
+```bash
 npm run dev
 ```
 
-Application available at: `http://localhost:5173`
+Frontend default URL: `http://localhost:5173`
+
+Useful frontend scripts:
+
+- `npm run dev` - start dev server
+- `npm run build` - production build
+- `npm run preview` - preview production build
 
 ---
 
-## Development Stage
+## Current Delivery Snapshot
 
-This repository contains the initial clean project foundation:
+Completed:
 
-- Directory structure established
-- Backend Express application initialized
-- Frontend React + Vite application initialized
-- Environment variable configuration in place
-- No business features have been implemented yet
+- Backend service foundation and domain route wiring
+- JWT authentication and authorization middleware
+- Frontend auth + route protection flow
+- Core repository structure and docs scaffolding
 
-Feature development will proceed in explicitly defined, incremental phases.
+In progress / next (Phase 8 focus):
+
+- Full frontend feature implementation for patient/doctor/admin workflows
+- UI completion for appointments, consultations, records, prescriptions, payments, and reviews
+- Final UX polish and consistency against the visual system reference
