@@ -111,6 +111,24 @@ function PatientAppointments() {
       appointment.doctor?.lastName || ""
     }`.trim();
 
+    const action =
+      appointment.paymentStatus !== "paid" &&
+      !["cancelled", "rejected", "completed"].includes(appointment.status)
+        ? {
+            label: "Complete payment",
+            href: `/patient/appointments/${id}?pay=1`,
+          }
+        : appointment.paymentStatus === "paid" &&
+            appointment.status === "confirmed"
+          ? {
+              label: "Join consultation",
+              href: `/patient/appointments/${id}/consultation`,
+            }
+          : {
+              label: "View details",
+              href: `/patient/appointments/${id}`,
+            };
+
     return (
       <div
         key={id}
@@ -149,10 +167,10 @@ function PatientAppointments() {
 
         <div className="mt-4">
           <Link
-            to={`/patient/appointments/${id}`}
+            to={action.href}
             className="inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] px-3 py-2 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-white hover:text-[#1D4ED8]"
           >
-            View details
+            {action.label}
           </Link>
         </div>
       </div>
@@ -193,13 +211,21 @@ function PatientAppointments() {
           </p>
         </div>
 
-        <Link
-          to="/patient/doctors"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1D4ED8]"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          Book a doctor
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/patient"
+            className="inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"
+          >
+            Back to dashboard
+          </Link>
+          <Link
+            to="/patient/doctors"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1D4ED8]"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Book a doctor
+          </Link>
+        </div>
       </header>
 
       {appointments.length === 0 ? (

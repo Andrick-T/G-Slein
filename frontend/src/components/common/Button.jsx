@@ -1,17 +1,22 @@
+import { forwardRef } from "react";
+
 import Spinner from "./Spinner.jsx";
 
-function Button({
-  children,
-  type = "button",
-  disabled = false,
-  loading = false,
-  onClick,
-  variant = "primary",
-  size = "md",
-  className = "",
-  fullWidth = false,
-  ...props
-}) {
+const Button = forwardRef(function Button(
+  {
+    children,
+    type = "button",
+    disabled = false,
+    loading = false,
+    onClick,
+    variant = "primary",
+    size = "md",
+    className = "",
+    fullWidth = false,
+    ...props
+  },
+  ref,
+) {
   const isDisabled = disabled || loading;
 
   const variants = {
@@ -39,6 +44,7 @@ function Button({
 
   return (
     <button
+      ref={ref}
       type={type}
       disabled={isDisabled}
       onClick={onClick}
@@ -62,6 +68,6 @@ function Button({
       <span>{children}</span>
     </button>
   );
-}
+});
 
 export default Button;

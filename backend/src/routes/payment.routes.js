@@ -5,6 +5,8 @@ import authorizeRoles from "../middleware/role.middleware.js";
 
 import {
   createPayment,
+  createStripeCheckoutSession,
+  handleStripeWebhook,
   getPayments,
   getPaymentById,
 } from "../controllers/payment.controller.js";
@@ -12,16 +14,28 @@ import {
 const router = express.Router();
 
 // --------------------------------------------------
-// All payment routes require authentication
+// Stripe webhook route must receive raw body before JSON parsing.
+// --------------------------------------------------
+
+router.post("/stripe/webhook", handleStripeWebhook);
+
+// --------------------------------------------------
+// All payment routes require authentication.
 // --------------------------------------------------
 
 router.use(authenticate);
 
 // --------------------------------------------------
 // POST /api/payments
+// Redirects to real Stripe checkout session.
 // --------------------------------------------------
 
 router.post("/", authorizeRoles("patient"), createPayment);
+router.post(
+  "/stripe/checkout-session",
+  authorizeRoles("patient"),
+  createStripeCheckoutSession,
+);
 
 // --------------------------------------------------
 // GET /api/payments

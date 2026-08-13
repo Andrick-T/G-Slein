@@ -220,6 +220,13 @@ function PatientPaymentDetails() {
           </Link>
 
           <Link
+            to="/patient"
+            className="inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"
+          >
+            Back to dashboard
+          </Link>
+
+          <Link
             to="/patient/appointments"
             className="inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1D4ED8]"
           >

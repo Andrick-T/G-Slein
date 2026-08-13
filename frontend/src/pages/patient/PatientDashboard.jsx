@@ -79,6 +79,36 @@ function PatientDashboard() {
     return upcoming[0] || null;
   }, [appointments]);
 
+  const upcomingAction = useMemo(() => {
+    if (!upcomingAppointment) {
+      return {
+        label: "Find doctors",
+        href: "/patient/doctors",
+      };
+    }
+
+    const appointmentId = upcomingAppointment._id || upcomingAppointment.id;
+
+    if (upcomingAppointment.paymentStatus !== "paid") {
+      return {
+        label: "Complete payment",
+        href: `/patient/appointments/${appointmentId}?pay=1`,
+      };
+    }
+
+    if (upcomingAppointment.status === "confirmed") {
+      return {
+        label: "Join consultation",
+        href: `/patient/appointments/${appointmentId}/consultation`,
+      };
+    }
+
+    return {
+      label: "View appointment",
+      href: `/patient/appointments/${appointmentId}`,
+    };
+  }, [upcomingAppointment]);
+
   const completedCount = appointments.filter((appointment) => {
     return appointment.status === "completed";
   }).length;
@@ -190,14 +220,20 @@ function PatientDashboard() {
                 {upcomingAppointment.startTime} - {upcomingAppointment.endTime}
               </p>
               <StatusBadge status={upcomingAppointment.status} />
+              <Link
+                to={upcomingAction.href}
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1D4ED8]"
+              >
+                {upcomingAction.label}
+              </Link>
             </div>
           ) : (
             <div className="mt-5">
               <EmptyState
                 title="No upcoming appointment"
                 description="You do not have any scheduled consultations yet."
-                actionLabel="View profile"
-                onAction={() => navigate("/patient/profile")}
+                actionLabel="Find doctors"
+                onAction={() => navigate("/patient/doctors")}
                 Icon={CalendarDays}
               />
             </div>
@@ -221,6 +257,19 @@ function PatientDashboard() {
             Your appointments and follow-up information stay organized in one
             place.
           </p>
+
+          <div className="mt-5">
+            <Link
+              to={
+                completedCount > 0
+                  ? "/patient/prescriptions"
+                  : "/patient/appointments"
+              }
+              className="inline-flex w-full items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"
+            >
+              {completedCount > 0 ? "View prescription" : "View appointments"}
+            </Link>
+          </div>
         </Card>
 
         <Card>
@@ -262,8 +311,8 @@ function PatientDashboard() {
               <EmptyState
                 title="No appointment activity yet"
                 description="Once appointments are scheduled, they will appear here."
-                actionLabel="View profile"
-                onAction={() => navigate("/patient/profile")}
+                actionLabel="Find doctors"
+                onAction={() => navigate("/patient/doctors")}
                 Icon={CalendarDays}
               />
             ) : (

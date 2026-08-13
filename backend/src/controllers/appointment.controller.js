@@ -179,9 +179,11 @@ const createAppointment = async (req, res, next) => {
 
     return successResponse(res, {
       statusCode: 201,
-      message: "Appointment booked successfully.",
+      message:
+        "Appointment created. Complete payment to confirm your consultation.",
       data: {
         appointment: getAppointmentDetails(appointment),
+        paymentRequired: appointment.paymentStatus !== "paid",
       },
     });
   } catch (error) {

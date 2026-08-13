@@ -207,15 +207,26 @@ function DoctorAppointments() {
   return (
     <div className="space-y-6 lg:space-y-8">
       <header className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0D9488]">
-          Appointments
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0F172A] sm:text-4xl">
-          Doctor appointments
-        </h1>
-        <p className="mt-2 text-sm text-[#64748B] sm:text-base">
-          Track today's, upcoming, completed, and past appointment activity.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0D9488]">
+              Appointments
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0F172A] sm:text-4xl">
+              Doctor appointments
+            </h1>
+            <p className="mt-2 text-sm text-[#64748B] sm:text-base">
+              Track today's, upcoming, completed, and past appointment activity.
+            </p>
+          </div>
+
+          <Link
+            to="/doctor"
+            className="inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"
+          >
+            Back to dashboard
+          </Link>
+        </div>
       </header>
 
       {appointments.length === 0 ? (

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import crypto from "crypto";
 
 import Appointment from "../models/Appointment.js";
+import { externalServicesConfig } from "../config/externalServices.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 // --------------------------------------------------
@@ -12,6 +13,8 @@ const isValidObjectId = (id) => {
   return mongoose.Types.ObjectId.isValid(id);
 };
 
+const JITSI_DEFAULT_DOMAIN = "meet.jit.si";
+
 const hasAppointmentAccess = (appointment, req) => {
   const userId = req.user.userId;
 
@@ -21,20 +24,85 @@ const hasAppointmentAccess = (appointment, req) => {
   const isDoctor =
     req.user.role === "doctor" && appointment.doctor.toString() === userId;
 
-  const isAdmin = req.user.role === "admin";
+  return isPatient || isDoctor;
+};
 
-  return isPatient || isDoctor || isAdmin;
+const getJitsiDomain = () => {
+  return externalServicesConfig.jitsi.domain || JITSI_DEFAULT_DOMAIN;
+};
+
+const buildMeetingUrl = (roomName) => {
+  return `https://${getJitsiDomain()}/${encodeURIComponent(roomName)}`;
+};
+
+const getConsultationAccessState = (appointment) => {
+  if (appointment.consultationType !== "video") {
+    return {
+      canAccess: false,
+      statusCode: 409,
+      message: "This appointment is not configured for video consultation.",
+    };
+  }
+
+  if (appointment.paymentStatus !== "paid") {
+    return {
+      canAccess: false,
+      statusCode: 409,
+      message:
+        "Payment must be completed before the consultation can be joined.",
+    };
+  }
+
+  if (appointment.status === "pending") {
+    return {
+      canAccess: false,
+      statusCode: 409,
+      message:
+        "Consultation is not available until the appointment is confirmed.",
+    };
+  }
+
+  if (appointment.status === "cancelled" || appointment.status === "rejected") {
+    return {
+      canAccess: false,
+      statusCode: 409,
+      message: "This consultation is no longer available.",
+    };
+  }
+
+  if (
+    appointment.status === "completed" ||
+    appointment.sessionStatus === "ended"
+  ) {
+    return {
+      canAccess: false,
+      statusCode: 409,
+      message: "This consultation has already ended.",
+    };
+  }
+
+  return {
+    canAccess: true,
+    statusCode: 200,
+    message: "Consultation access is available.",
+  };
 };
 
 const getSessionDetails = (appointment) => {
+  const isJoinable =
+    appointment.sessionStatus === "active" &&
+    Boolean(appointment.sessionRoomId);
+
   return {
     appointmentId: appointment._id,
     consultationType: appointment.consultationType,
-    meetingUrl: appointment.meetingUrl,
-    sessionRoomId: appointment.sessionRoomId,
+    jitsiDomain: getJitsiDomain(),
+    meetingUrl: isJoinable ? buildMeetingUrl(appointment.sessionRoomId) : null,
+    sessionRoomId: isJoinable ? appointment.sessionRoomId : null,
     sessionStatus: appointment.sessionStatus,
     sessionStartedAt: appointment.sessionStartedAt,
     sessionEndedAt: appointment.sessionEndedAt,
+    canJoin: isJoinable,
   };
 };
 
@@ -70,6 +138,15 @@ const getSession = async (req, res, next) => {
       return errorResponse(res, {
         statusCode: 403,
         message: "You do not have access to this consultation session.",
+      });
+    }
+
+    const accessState = getConsultationAccessState(appointment);
+
+    if (!accessState.canAccess) {
+      return errorResponse(res, {
+        statusCode: accessState.statusCode,
+        message: accessState.message,
       });
     }
 
@@ -126,6 +203,13 @@ const startSession = async (req, res, next) => {
       });
     }
 
+    if (appointment.consultationType !== "video") {
+      return errorResponse(res, {
+        statusCode: 409,
+        message: "This appointment is not configured for video consultation.",
+      });
+    }
+
     // --------------------------------------------------
     // Appointment must be confirmed
     // --------------------------------------------------
@@ -134,6 +218,13 @@ const startSession = async (req, res, next) => {
       return errorResponse(res, {
         statusCode: 409,
         message: "Only a confirmed appointment can start a consultation.",
+      });
+    }
+
+    if (appointment.paymentStatus !== "paid") {
+      return errorResponse(res, {
+        statusCode: 409,
+        message: "Payment must be completed before the consultation can start.",
       });
     }
 
@@ -163,9 +254,12 @@ const startSession = async (req, res, next) => {
     // Generate internal room identifier
     // --------------------------------------------------
 
-    appointment.sessionRoomId = crypto.randomUUID();
+    appointment.sessionRoomId =
+      appointment.sessionRoomId || crypto.randomUUID();
+    appointment.meetingUrl = buildMeetingUrl(appointment.sessionRoomId);
     appointment.sessionStatus = "active";
     appointment.sessionStartedAt = new Date();
+    appointment.sessionEndedAt = undefined;
 
     await appointment.save();
 

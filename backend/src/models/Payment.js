@@ -29,25 +29,42 @@ const paymentSchema = new mongoose.Schema(
 
     currency: {
       type: String,
-      default: "USD",
+      default: "XAF",
       uppercase: true,
     },
 
     status: {
       type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
+      enum: ["pending", "paid", "failed", "cancelled", "refunded"],
       default: "pending",
     },
 
     provider: {
       type: String,
       enum: ["simulated", "stripe"],
-      default: "simulated",
+      default: "stripe",
     },
 
     transactionId: {
       type: String,
       trim: true,
+    },
+
+    transactionReference: {
+      type: String,
+      trim: true,
+    },
+
+    providerPaymentId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+
+    paidAt: {
+      type: Date,
+      default: null,
     },
   },
   {

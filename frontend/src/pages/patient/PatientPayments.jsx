@@ -1,10 +1,11 @@
 import { CreditCard, ReceiptText } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import Button from "../../components/common/Button.jsx";
 import Card from "../../components/common/Card.jsx";
 import EmptyState from "../../components/common/EmptyState.jsx";
+import PaymentDrawer from "../../components/payment/PaymentDrawer.jsx";
 import Spinner from "../../components/common/Spinner.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import api from "../../services/api.js";
@@ -29,11 +30,16 @@ const formatDate = (value) => {
 };
 
 function PatientPayments() {
+  const location = useLocation();
+
   const [payments, setPayments] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [payingAppointmentId, setPayingAppointmentId] = useState("");
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [checkingReturnStatus, setCheckingReturnStatus] = useState(false);
   const [actionError, setActionError] = useState("");
   const [actionSuccess, setActionSuccess] = useState("");
 
@@ -46,6 +52,82 @@ function PatientPayments() {
     setPayments(paymentsResponse.data.payments || []);
     setAppointments(appointmentsResponse.data.appointments || []);
   };
+
+  useEffect(() => {
+    let active = true;
+
+    const checkReturnedPaymentState = async () => {
+      const query = new URLSearchParams(location.search);
+      const status = query.get("payment");
+      const appointmentId = query.get("appointmentId");
+
+      if (status === "cancelled") {
+        setActionError("Payment was cancelled before completion.");
+        return;
+      }
+
+      if (status !== "processing" || !appointmentId) {
+        return;
+      }
+
+      setActionError("");
+      setActionSuccess("Checking payment status...");
+      setCheckingReturnStatus(true);
+
+      const attempts = 6;
+
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
+        if (!active) {
+          return;
+        }
+
+        try {
+          const appointmentResponse = await api.get(
+            `/appointments/${appointmentId}`,
+          );
+          const appointment = appointmentResponse?.data?.appointment;
+
+          if (appointment?.paymentStatus === "paid") {
+            await loadData();
+
+            if (!active) {
+              return;
+            }
+
+            setActionSuccess(
+              "Payment confirmed by backend. Your appointment is now marked as paid.",
+            );
+            setCheckingReturnStatus(false);
+            return;
+          }
+        } catch {
+          // Continue short polling window before showing fallback guidance.
+        }
+
+        if (attempt < attempts - 1) {
+          await new Promise((resolve) => {
+            window.setTimeout(resolve, 2500);
+          });
+        }
+      }
+
+      if (!active) {
+        return;
+      }
+
+      await loadData();
+      setActionSuccess(
+        "Payment is still processing. Refresh shortly to see the updated backend status.",
+      );
+      setCheckingReturnStatus(false);
+    };
+
+    checkReturnedPaymentState();
+
+    return () => {
+      active = false;
+    };
+  }, [location.search]);
 
   useEffect(() => {
     let active = true;
@@ -105,11 +187,12 @@ function PatientPayments() {
     });
   }, [appointments]);
 
-  const handleSimulatedPayment = async (appointment) => {
+  const handleStripeCheckout = async (appointment) => {
     setActionError("");
     setActionSuccess("");
     setPayingAppointmentId(appointment._id || appointment.id);
 
+    const appointmentId = appointment._id || appointment.id;
     const amount = Number(
       appointment.doctor?.doctorProfile?.consultationFee || 0,
     );
@@ -123,28 +206,47 @@ function PatientPayments() {
     }
 
     try {
-      await api.post("/payments", {
-        appointment: appointment._id || appointment.id,
-        amount,
-        currency: "USD",
+      const response = await api.post("/payments/stripe/checkout-session", {
+        appointmentId,
       });
 
-      await loadData();
-      setActionSuccess("Payment completed successfully (simulated provider).");
+      const sessionUrl = response?.data?.session?.url;
+
+      if (!sessionUrl) {
+        throw new Error("Stripe checkout session URL was not returned.");
+      }
+
+      window.location.href = sessionUrl;
     } catch (requestError) {
       if (requestError?.status === 409) {
         setActionError(
           requestError.message ||
-            "A payment already exists for this appointment.",
+            "A payment is already in progress or has already been paid for this appointment.",
         );
       } else if (requestError?.status === 400) {
         setActionError(requestError.message || "Unable to process payment.");
+      } else if (requestError?.status === 403) {
+        setActionError("You are not authorized to pay for this appointment.");
       } else {
         setActionError(requestError.message || "Payment request failed.");
       }
     } finally {
       setPayingAppointmentId("");
     }
+  };
+
+  const formatAmount = (value, currency = "XAF") => {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return "Not available";
+    }
+
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   if (loading) {
@@ -169,15 +271,27 @@ function PatientPayments() {
   return (
     <div className="space-y-6 lg:space-y-8">
       <header className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0D9488]">
-          Payments
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0F172A] sm:text-4xl">
-          Payment history
-        </h1>
-        <p className="mt-2 text-sm text-[#64748B] sm:text-base">
-          Track appointment payments and complete pending consultation payments.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0D9488]">
+              Payments
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0F172A] sm:text-4xl">
+              Payment history
+            </h1>
+            <p className="mt-2 text-sm text-[#64748B] sm:text-base">
+              Track appointment payments and complete pending consultation
+              payments.
+            </p>
+          </div>
+
+          <Link
+            to="/patient"
+            className="inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"
+          >
+            Back to dashboard
+          </Link>
+        </div>
       </header>
 
       {actionError ? (
@@ -194,7 +308,12 @@ function PatientPayments() {
           role="status"
           className="rounded-xl border border-[#CCFBF1] bg-[#F0FDFA] px-4 py-3 text-sm text-[#0F766E]"
         >
-          {actionSuccess}
+          <div className="flex items-center gap-2">
+            {checkingReturnStatus ? (
+              <Spinner size="sm" className="text-[#0F766E]" />
+            ) : null}
+            <span>{actionSuccess}</span>
+          </div>
         </div>
       ) : null}
 
@@ -203,7 +322,8 @@ function PatientPayments() {
           Pending payments
         </h2>
         <p className="mt-1 text-sm text-[#64748B]">
-          Payments are currently processed using the backend simulated provider.
+          Payments are processed through Stripe Checkout and confirmed by the
+          backend webhook.
         </p>
 
         <div className="mt-4 space-y-3">
@@ -234,19 +354,22 @@ function PatientPayments() {
                         - {appointment.endTime}
                       </p>
                       <p className="mt-1 text-sm text-[#64748B]">
-                        Amount: {fee > 0 ? `$${fee}` : "Not available"}
+                        Amount: {formatAmount(fee, "XAF")}
                       </p>
                     </div>
 
                     <Button
                       type="button"
-                      loading={payingAppointmentId === appointmentId}
                       disabled={
                         payingAppointmentId === appointmentId || fee <= 0
                       }
-                      onClick={() => handleSimulatedPayment(appointment)}
+                      onClick={() => {
+                        setSelectedAppointment(appointment);
+                        setDrawerOpen(true);
+                        setActionError("");
+                      }}
                     >
-                      Pay now
+                      Complete payment
                     </Button>
                   </div>
                 </div>
@@ -291,7 +414,7 @@ function PatientPayments() {
                     <span className="font-semibold text-[#334155]">
                       Amount:
                     </span>{" "}
-                    {payment.currency || "USD"} {payment.amount}
+                    {formatAmount(payment.amount, payment.currency || "XAF")}
                   </p>
                   <p>
                     <span className="font-semibold text-[#334155]">
@@ -325,6 +448,26 @@ function PatientPayments() {
           })}
         </section>
       )}
+
+      <PaymentDrawer
+        open={drawerOpen}
+        appointment={selectedAppointment}
+        loading={
+          Boolean(selectedAppointment) &&
+          payingAppointmentId ===
+            (selectedAppointment?._id || selectedAppointment?.id)
+        }
+        error={actionError}
+        onClose={() => {
+          if (!payingAppointmentId) {
+            setDrawerOpen(false);
+            setSelectedAppointment(null);
+          }
+        }}
+        onConfirm={async (appointment) => {
+          await handleStripeCheckout(appointment);
+        }}
+      />
     </div>
   );
 }

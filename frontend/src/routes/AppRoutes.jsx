@@ -19,6 +19,7 @@ import PatientDoctorBooking from "../pages/patient/PatientDoctorBooking.jsx";
 import PatientBookingConfirmation from "../pages/patient/PatientBookingConfirmation.jsx";
 import PatientAppointments from "../pages/patient/PatientAppointments.jsx";
 import PatientAppointmentDetails from "../pages/patient/PatientAppointmentDetails.jsx";
+import PatientConsultation from "../pages/patient/PatientConsultation.jsx";
 import PatientMedicalRecords from "../pages/patient/PatientMedicalRecords.jsx";
 import PatientMedicalRecordDetails from "../pages/patient/PatientMedicalRecordDetails.jsx";
 import PatientPrescriptions from "../pages/patient/PatientPrescriptions.jsx";
@@ -69,6 +70,10 @@ function AppRoutes() {
           <Route
             path="appointments/:appointmentId"
             element={<PatientAppointmentDetails />}
+          />
+          <Route
+            path="appointments/:appointmentId/consultation"
+            element={<PatientConsultation />}
           />
           <Route
             path="appointments/confirmation/:appointmentId"

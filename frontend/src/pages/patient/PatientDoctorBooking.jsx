@@ -188,6 +188,9 @@ function PatientDoctorBooking() {
       });
 
       const appointment = response?.data?.appointment;
+      const paymentRequired =
+        Boolean(response?.data?.paymentRequired) ||
+        appointment?.paymentStatus !== "paid";
 
       if (!appointment?.id) {
         throw new Error(
@@ -195,9 +198,14 @@ function PatientDoctorBooking() {
         );
       }
 
-      navigate(`/patient/appointments/confirmation/${appointment.id}`, {
-        replace: true,
-      });
+      navigate(
+        `/patient/appointments/confirmation/${appointment.id}?payment=${
+          paymentRequired ? "required" : "confirmed"
+        }`,
+        {
+          replace: true,
+        },
+      );
     } catch (requestError) {
       if (requestError?.status === 409) {
         setConflictError(

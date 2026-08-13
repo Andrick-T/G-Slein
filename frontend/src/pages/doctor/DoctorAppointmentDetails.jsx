@@ -261,6 +261,13 @@ function DoctorAppointmentDetails() {
             >
               Back to appointments
             </Link>
+
+            <Link
+              to="/doctor"
+              className="inline-flex w-full items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"
+            >
+              Back to dashboard
+            </Link>
             <Link
               to="/doctor/patients"
               className="inline-flex w-full items-center justify-center rounded-lg border border-[#CBD5E1] px-4 py-2.5 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-[#F8FAFC] hover:text-[#1D4ED8]"

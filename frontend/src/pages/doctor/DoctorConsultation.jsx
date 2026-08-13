@@ -2,7 +2,6 @@ import {
   CalendarDays,
   ClipboardList,
   Clock3,
-  ExternalLink,
   FileText,
   Pill,
   Video,
@@ -10,6 +9,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import ConsultationMeeting from "../../components/consultation/ConsultationMeeting.jsx";
 import Button from "../../components/common/Button.jsx";
 import Card from "../../components/common/Card.jsx";
 import EmptyState from "../../components/common/EmptyState.jsx";
@@ -45,6 +45,54 @@ const emptyMedication = {
   instructions: "",
 };
 
+const buildFallbackSession = (appointment, appointmentId) => {
+  return {
+    appointmentId,
+    consultationType: appointment?.consultationType || "video",
+    jitsiDomain: "",
+    meetingUrl: null,
+    sessionRoomId: null,
+    sessionStatus: appointment?.sessionStatus || "not_started",
+    sessionStartedAt: appointment?.sessionStartedAt || null,
+    sessionEndedAt: appointment?.sessionEndedAt || null,
+    canJoin: false,
+  };
+};
+
+const getDoctorSessionNotice = (appointment, session, fallbackMessage = "") => {
+  if (fallbackMessage) {
+    return fallbackMessage;
+  }
+
+  if (appointment?.status === "pending") {
+    return "Confirm the appointment to make the consultation available.";
+  }
+
+  if (appointment?.paymentStatus !== "paid") {
+    return "Payment must be completed before the consultation can start.";
+  }
+
+  if (
+    appointment?.status === "confirmed" &&
+    session?.sessionStatus === "not_started"
+  ) {
+    return "Start the consultation to open the authorized Jitsi room.";
+  }
+
+  if (session?.sessionStatus === "active" && session?.canJoin) {
+    return "The consultation room is live. Use the meeting panel below to continue the session.";
+  }
+
+  if (
+    appointment?.status === "completed" ||
+    session?.sessionStatus === "ended"
+  ) {
+    return "This consultation has ended. You can complete follow-up actions below.";
+  }
+
+  return "Consultation access is managed from the appointment lifecycle below.";
+};
+
 function DoctorConsultation() {
   const navigate = useNavigate();
   const { appointmentId } = useParams();
@@ -55,6 +103,7 @@ function DoctorConsultation() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
+  const [sessionNotice, setSessionNotice] = useState("");
 
   const [actionError, setActionError] = useState("");
   const [actionSuccess, setActionSuccess] = useState("");
@@ -70,20 +119,39 @@ function DoctorConsultation() {
   });
 
   const loadData = async () => {
-    const [appointmentResponse, sessionResponse, prescriptionsResponse] =
-      await Promise.all([
-        api.get(`/appointments/${appointmentId}`),
-        api.get(`/consultations/appointments/${appointmentId}/session`),
-        api.get("/prescriptions"),
-      ]);
+    const [appointmentResponse, prescriptionsResponse] = await Promise.all([
+      api.get(`/appointments/${appointmentId}`),
+      api.get("/prescriptions"),
+    ]);
 
     const nextAppointment = appointmentResponse.data.appointment || null;
-    const nextSession = sessionResponse.data.session || null;
+    let nextSession = buildFallbackSession(nextAppointment, appointmentId);
+    let nextNotice = "";
+
+    try {
+      const sessionResponse = await api.get(
+        `/consultations/appointments/${appointmentId}/session`,
+      );
+
+      nextSession = sessionResponse.data.session || nextSession;
+    } catch (requestError) {
+      if (requestError?.status === 409) {
+        nextNotice =
+          requestError.message ||
+          "Consultation access is not available for this appointment yet.";
+      } else {
+        throw requestError;
+      }
+    }
+
     const doctorPrescriptions = prescriptionsResponse.data.prescriptions || [];
 
     setAppointment(nextAppointment);
     setSession(nextSession);
     setPrescriptions(doctorPrescriptions);
+    setSessionNotice(
+      getDoctorSessionNotice(nextAppointment, nextSession, nextNotice),
+    );
   };
 
   useEffect(() => {
@@ -95,20 +163,11 @@ function DoctorConsultation() {
       setNotFound(false);
 
       try {
-        const [appointmentResponse, sessionResponse, prescriptionsResponse] =
-          await Promise.all([
-            api.get(`/appointments/${appointmentId}`),
-            api.get(`/consultations/appointments/${appointmentId}/session`),
-            api.get("/prescriptions"),
-          ]);
-
         if (!active) {
           return;
         }
 
-        setAppointment(appointmentResponse.data.appointment || null);
-        setSession(sessionResponse.data.session || null);
-        setPrescriptions(prescriptionsResponse.data.prescriptions || []);
+        await loadData();
       } catch (requestError) {
         if (!active) {
           return;
@@ -361,6 +420,10 @@ function DoctorConsultation() {
     appointment.patient?.lastName || ""
   }`.trim();
 
+  const displayName = `Dr. ${appointment.doctor?.firstName || "Doctor"} ${
+    appointment.doctor?.lastName || ""
+  }`.trim();
+
   return (
     <div className="space-y-6 lg:space-y-8">
       <header className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-6">
@@ -371,10 +434,16 @@ function DoctorConsultation() {
           Consultation with {patientName}
         </h1>
         <p className="mt-2 text-sm text-[#64748B] sm:text-base">
-          Manage session lifecycle and prescription actions using existing
-          backend workflows.
+          Manage session lifecycle, join the secure Jitsi room, and complete
+          follow-up actions using existing backend workflows.
         </p>
       </header>
+
+      {sessionNotice ? (
+        <div className="rounded-xl border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 text-sm text-[#1D4ED8]">
+          {sessionNotice}
+        </div>
+      ) : null}
 
       {actionError ? (
         <div
@@ -457,6 +526,15 @@ function DoctorConsultation() {
                 {appointment.consultationType || "video"}
               </p>
             </div>
+
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#64748B]">
+                Payment status
+              </p>
+              <div className="mt-1">
+                <StatusBadge status={appointment.paymentStatus || "pending"} />
+              </div>
+            </div>
           </div>
 
           {appointment.reason ? (
@@ -511,28 +589,43 @@ function DoctorConsultation() {
             >
               End consultation
             </Button>
-
-            {appointment.meetingUrl ? (
-              <a
-                href={appointment.meetingUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#CBD5E1] px-4 text-sm font-semibold text-[#0F172A] transition hover:border-[#2563EB] hover:bg-white hover:text-[#1D4ED8]"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Open meeting link
-              </a>
-            ) : null}
           </div>
 
           <div className="mt-4 rounded-xl border border-[#DBEAFE] bg-[#EFF6FF] p-4 text-sm text-[#1D4ED8]">
-            Existing integration exposes a meetingUrl and consultation session
-            lifecycle; no additional video SDK is introduced in this phase.
+            The consultation room only becomes available after backend
+            authorization verifies appointment access, session status, and
+            payment state.
           </div>
         </Card>
 
         <Card>
           <div className="flex items-center gap-2">
+            {session.canJoin && session.sessionRoomId ? (
+              <ConsultationMeeting
+                domain={session.jitsiDomain || "meet.jit.si"}
+                roomName={session.sessionRoomId}
+                displayName={displayName}
+                sessionStatus={session.sessionStatus}
+                onLeave={() =>
+                  navigate(`/doctor/appointments/${appointmentId}`)
+                }
+              />
+            ) : (
+              <Card>
+                <div className="flex items-start gap-3">
+                  <Video className="mt-0.5 h-5 w-5 text-[#2563EB]" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-[#0F172A]">
+                      Waiting for room access
+                    </h2>
+                    <p className="mt-2 text-sm text-[#64748B]">
+                      The secure Jitsi room will appear here as soon as the
+                      consultation session is active.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
             <Pill className="h-5 w-5 text-[#0D9488]" />
             <h2 className="text-xl font-semibold text-[#0F172A]">
               Prescription

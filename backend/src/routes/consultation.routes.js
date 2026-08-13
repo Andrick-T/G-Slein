@@ -19,7 +19,7 @@ const router = express.Router();
 router.get(
   "/appointments/:id/session",
   authenticate,
-  authorizeRoles("patient", "doctor", "admin"),
+  authorizeRoles("patient", "doctor"),
   getSession,
 );
 

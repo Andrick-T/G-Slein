@@ -9,6 +9,20 @@ import Prescription from "../models/Prescription.js";
 import Review from "../models/Review.js";
 import Payment from "../models/Payment.js";
 
+const toIsoDate = (date) => {
+  const value = new Date(date);
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const toTimeValue = (date) => {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
 const seedDatabase = async () => {
   try {
     console.log("========================================");
@@ -44,6 +58,7 @@ const seedDatabase = async () => {
     // --------------------------------------------------
 
     const password = "Password123!";
+    const MIN_CONSULTATION_FEE_XAF = 5000;
 
     const admin = await User.create({
       firstName: "System",
@@ -66,7 +81,7 @@ const seedDatabase = async () => {
         specialization: "Cardiology",
         licenseNumber: "CM-CARD-1001",
         experience: 8,
-        consultationFee: 25,
+        consultationFee: Math.max(5000, MIN_CONSULTATION_FEE_XAF),
         bio: "Cardiologist specializing in cardiovascular disease prevention and general cardiac care.",
         languages: ["English", "French"],
         isVerified: true,
@@ -85,12 +100,23 @@ const seedDatabase = async () => {
         specialization: "General Medicine",
         licenseNumber: "CM-GEN-1002",
         experience: 5,
-        consultationFee: 20,
+        consultationFee: 6500,
         bio: "General practitioner providing primary healthcare consultations and preventive care.",
         languages: ["English", "French"],
         isVerified: true,
       },
     });
+
+    const seededDoctorFees = {
+      doctor1: Math.max(
+        Number(doctor1.doctorProfile.consultationFee || 0),
+        MIN_CONSULTATION_FEE_XAF,
+      ),
+      doctor2: Math.max(
+        Number(doctor2.doctorProfile.consultationFee || 0),
+        MIN_CONSULTATION_FEE_XAF,
+      ),
+    };
 
     const patient1 = await User.create({
       firstName: "Daniel",
@@ -150,7 +176,7 @@ const seedDatabase = async () => {
       consultationType: "video",
       meetingUrl: "https://meet.jit.si/g-slein-demo-appointment-001",
       reason: "Routine cardiovascular consultation",
-      paymentStatus: "paid",
+      paymentStatus: "pending",
     });
 
     const appointment2 = await Appointment.create({
@@ -163,7 +189,7 @@ const seedDatabase = async () => {
       consultationType: "video",
       meetingUrl: "https://meet.jit.si/g-slein-demo-appointment-002",
       reason: "General health consultation",
-      paymentStatus: "paid",
+      paymentStatus: "pending",
     });
 
     const appointment3 = await Appointment.create({
@@ -177,6 +203,35 @@ const seedDatabase = async () => {
       meetingUrl: "https://meet.jit.si/g-slein-demo-appointment-003",
       reason: "Follow-up consultation",
       paymentStatus: "pending",
+    });
+
+    // --------------------------------------------------
+    // Development-only Jitsi regression test appointment
+    // This record is intentionally paid and confirmed so
+    // doctor/patient can test the real consultation flow.
+    // --------------------------------------------------
+
+    const now = new Date();
+    const jitsiTestDate = new Date(now);
+    jitsiTestDate.setHours(12, 0, 0, 0);
+
+    const jitsiTestEnd = new Date(now);
+    jitsiTestEnd.setMinutes(jitsiTestEnd.getMinutes() + 30);
+
+    const jitsiTestStartTime = toTimeValue(now);
+    const jitsiTestEndTime = toTimeValue(jitsiTestEnd);
+    const jitsiTestToken = `JITSI_TEST_${Date.now()}`;
+
+    const jitsiTestAppointment = await Appointment.create({
+      patient: patient1._id,
+      doctor: doctor1._id,
+      date: jitsiTestDate,
+      startTime: jitsiTestStartTime,
+      endTime: jitsiTestEndTime,
+      status: "confirmed",
+      consultationType: "video",
+      reason: "DEV ONLY - Jitsi paid consultation regression test",
+      paymentStatus: "paid",
     });
 
     console.log("Appointments created.");
@@ -276,22 +331,36 @@ const seedDatabase = async () => {
         patient: patient1._id,
         doctor: doctor1._id,
         appointment: appointment1._id,
-        amount: doctor1.doctorProfile.consultationFee,
-        currency: "USD",
-        status: "paid",
-        provider: "simulated",
-        transactionId: "GSL-TEST-PAY-001",
+        amount: seededDoctorFees.doctor1,
+        currency: "XAF",
+        status: "pending",
+        provider: "stripe",
+        transactionId: "STRIPE-TEST-PAY-001",
       },
 
       {
         patient: patient2._id,
         doctor: doctor2._id,
         appointment: appointment2._id,
-        amount: doctor2.doctorProfile.consultationFee,
-        currency: "USD",
+        amount: seededDoctorFees.doctor2,
+        currency: "XAF",
+        status: "pending",
+        provider: "stripe",
+        transactionId: "STRIPE-TEST-PAY-002",
+      },
+
+      {
+        patient: patient1._id,
+        doctor: doctor1._id,
+        appointment: jitsiTestAppointment._id,
+        amount: seededDoctorFees.doctor1,
+        currency: "XAF",
         status: "paid",
-        provider: "simulated",
-        transactionId: "GSL-TEST-PAY-002",
+        provider: "stripe",
+        transactionId: jitsiTestToken,
+        transactionReference: `${jitsiTestToken}_REF`,
+        providerPaymentId: `${jitsiTestToken}_PROVIDER`,
+        paidAt: new Date(),
       },
     ]);
 
@@ -351,6 +420,45 @@ const seedDatabase = async () => {
     console.log("\nPatient 2");
     console.log("Email:    emily.patient@g-slein.test");
     console.log("Password: Password123!");
+
+    console.log("\n----------------------------------------");
+    console.log("G-SLEIN JITSI TEST APPOINTMENT");
+    console.log("----------------------------------------");
+    console.log(
+      `Patient: ${patient1.firstName} ${patient1.lastName} (${patient1.email})`,
+    );
+    console.log(
+      `Doctor: ${doctor1.firstName} ${doctor1.lastName} (${doctor1.email})`,
+    );
+    console.log(`Appointment ID: ${jitsiTestAppointment._id}`);
+    console.log(`Appointment status: ${jitsiTestAppointment.status}`);
+    console.log(`Payment status: ${jitsiTestAppointment.paymentStatus}`);
+    console.log(`Consultation type: ${jitsiTestAppointment.consultationType}`);
+    console.log(
+      `Scheduled: ${toIsoDate(jitsiTestAppointment.date)} ${jitsiTestAppointment.startTime}-${jitsiTestAppointment.endTime}`,
+    );
+    console.log(`Payment reference: ${jitsiTestToken}`);
+    console.log("Consultation room: generated when doctor starts");
+
+    console.log("\nMANUAL JITSI TEST PROCEDURE");
+    console.log("1. Login as the seeded doctor.");
+    console.log("2. Open the test appointment.");
+    console.log("3. Start the consultation.");
+    console.log("4. Confirm the consultation becomes active.");
+    console.log("5. Open a second browser/incognito window.");
+    console.log("6. Login as the seeded patient.");
+    console.log("7. Open the same appointment.");
+    console.log("8. Join consultation.");
+    console.log("9. Test microphone.");
+    console.log("10. Test camera.");
+    console.log("11. Confirm doctor sees patient.");
+    console.log("12. Confirm patient sees doctor.");
+    console.log("13. Test mute/unmute.");
+    console.log("14. Test camera on/off.");
+    console.log("15. Leave the consultation.");
+    console.log(
+      "16. Have the doctor end the consultation using the normal application flow.",
+    );
 
     console.log("\n========================================");
   } catch (error) {

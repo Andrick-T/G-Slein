@@ -1,21 +1,12 @@
-PHASE 8 — FRONTEND MODULE VALIDATION
-│
-├── Stage 8.0 — Phase 8 Baseline & UI Rules
-│
-├── Stage 8.1 — Shared UI Foundation
-│
-├── Stage 8.2 — Public Experience
-│
-├── Stage 8.3 — Authentication Experience
-│
-├── Stage 8.4 — Patient Module
-│
-├── Stage 8.5 — Doctor Module
-│
-├── Stage 8.6 — Admin Module
-│
-├── Stage 8.7 — Responsive & Accessibility Pass
-│
-├── Stage 8.8 — Cross-Module Frontend Validation
-│
-└── Stage 8.9 — Phase 8 Final Cleanup & Acceptance
+| Stage  | Work package                                | Priority |
+| ------ | ------------------------------------------- | -------: |
+| P10-01 | External-service foundation & configuration | Critical |
+| P10-02 | Real Jitsi consultation                     | Critical |
+| P10-03 | Stripe payments                             | Critical |
+| P10-04 | noKash payments                             | Critical |
+| P10-05 | Email notification system                   |     High |
+| P10-06 | SMS evaluation/integration                  |   Medium |
+| P10-07 | Secure medical-file storage                 | Critical |
+| P10-08 | Frontend integration & UX hardening         | Critical |
+| P10-09 | Failure handling + consistency              | Critical |
+| P10-10 | Full integration/regression/beta validation | Critical |
